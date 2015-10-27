@@ -5,22 +5,14 @@ This tool allows you, through an user interface, to choose a sequence of already
 
 ## Requirements
 * Java 1.7 is required in order to run this application. Please update your Java by going to http://java.com/getjava if you have a lower version.
-* Include common-codec see https://commons.apache.org/proper/commons-codec/  
+* Include commons-codec see https://commons.apache.org/proper/commons-codec/  
 * Include commons-logging see https://commons.apache.org/proper/commons-logging/download_logging.cgi
 
 
 ## Basic usage instructions:
 
-1. Execute the file as required:
+1. Run project
 	
-	Windows:
-	- Double click the runReportMergerWindows.bat file to run the program. 
-	This script will ensure that you have the required version of Java installed in order to run the application. You can run the file by double clicking it.
-	
-	Linux:
-	- Run the file called runReportMergerLinux.sh located in the same folder as the application. This script will ensure that you have the required version of Java installed in order to run the application.
-	 You can run the file by double clicking it, or going into the terminal and typing ./Location of the file/runReportMerger.sh
-
 2. Select the report you would like to get/merge in the combo box 'Report type'. This tool for now is just available for these reports: 
 	
 	- Settlement detail report
