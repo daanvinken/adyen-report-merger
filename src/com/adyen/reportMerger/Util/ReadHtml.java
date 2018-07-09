@@ -103,7 +103,6 @@ public final class ReadHtml {
             // Close the input stream
             in.close();
             tmpHTML.delete();
-            // System.out.println("I can provissionary stop removing the file reports.html in: HTMLLineReader - getReportDetails - f.delete()");
 
         } catch (IOException e1) {
             e1.printStackTrace();
@@ -139,7 +138,6 @@ public final class ReadHtml {
             String[] htmlWords2 = spliting1.split(aux);
             reportDate = htmlWords2[0];
 
-//             System.out.println("This batch date is: "+reportDate);
         }
         return reportDate;
     }
@@ -160,9 +158,7 @@ public final class ReadHtml {
             spliting1 = Pattern.compile("<", Pattern.LITERAL);
             String[] htmlWords2 = spliting1.split(aux);
             reportSize = htmlWords2[0];
-
-//             System.out.println("This batch size is: "+reportSize);
-        }
+            }
         return reportSize;
     }
 
@@ -180,7 +176,6 @@ public final class ReadHtml {
             String[] htmlWords = spliting.split(htmlLine);
             reportInfo = htmlWords[1];
 
-//			System.out.println("This report name is: " + reportInfo);
         }
         return reportInfo;
     }
