@@ -5,6 +5,7 @@ import java.awt.*;
 
 /**
  * Created by andrew on 9/29/16.
+ * not used.. not sure why this is here
  */
 public class ReportLocationRenderer extends JPanel implements ListCellRenderer {
     JLabel name;

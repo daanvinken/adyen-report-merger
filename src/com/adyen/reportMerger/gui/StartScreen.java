@@ -2,7 +2,6 @@ package com.adyen.reportMerger.gui;
 
 import com.adyen.reportMerger.Util.ContextMenuMouseListener;
 import com.adyen.reportMerger.Util.Validate;
-import com.adyen.reportMerger.entities.LogFileHandler;
 import com.adyen.reportMerger.entities.ReportLevels;
 import com.adyen.reportMerger.entities.ReportTypes;
 import com.adyen.reportMerger.runners.Controller;
@@ -11,40 +10,48 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
 
 /**
  * Created by andrew on 11/1/16.
+ * moving away from the static hell this was when I picked up this project
  */
 public class StartScreen implements ActionListener {
 
-    public static JFrame frame;
-    public static JComboBox levelCombo;
-    public static JComboBox reportTypeCombo;
-    public static JComboBox mergeByCombo;
-    public static JTextField companyCode;
-    public static JLabel companyCodeError;
-    public static JLabel merchantCodeLabel;
-    public static JTextField merchantCode;
-    public static JLabel merchantCodeError;
-    public static JTextField reportUserName;
-    public static JLabel reportUserNameError;
-    public static JPasswordField passwordField;
-    public static JLabel passwordError;
-    public static JButton pathButton;
-    public static JButton continueButton;
-    public static JButton exitButton;
-    public static JLabel reportUserLabelEnd;
-    public static JLabel pathError;
+    private JFrame frame;
+    private JComboBox levelCombo;
+    private JComboBox reportTypeCombo;
+    private JComboBox mergeByCombo;
+    private JTextField companyCode;
+    private JLabel companyCodeError;
+    private JLabel merchantCodeLabel;
+    private JTextField merchantCode;
+    private JLabel merchantCodeError;
+    private JTextField reportUserName;
+    private JLabel reportUserNameError;
+    private JPasswordField passwordField;
+    private JLabel passwordError;
+    private JButton pathButton;
+    private JButton continueButton;
+    private JButton exitButton;
+    private JLabel reportUserLabelEnd;
+    private JLabel pathError;
 
-    public static String path;
-    public static JFileChooser chooser;
+    private String path;
+    private JFileChooser chooser;
 
-    public static ReportTypes reportType;
-    public static ReportLevels reportLevel;
+    private ReportTypes reportType;
+    private ReportLevels reportLevel;
 
+    private static StartScreen instance;
 
-    public StartScreen() {
+    public static StartScreen getInstance() {
+        if (instance == null) {
+            instance = new StartScreen();
+        }
+        return instance;
+    }
+    private StartScreen() {
 
         frame = new JFrame("Adyen Report Merger");
         frame.addWindowListener(exitListener);
@@ -273,7 +280,6 @@ public class StartScreen implements ActionListener {
             @Override
             public void focusLost(FocusEvent e) {
 
-//				System.out.println("in companyCodeListener");
                 reportUserLabelEnd.setText("@Company." + companyCode.getText());
             }
 
@@ -342,17 +348,15 @@ public class StartScreen implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                ProgressIndicatorScreen progressIndicatorScreen = new ProgressIndicatorScreen();
-
-                progressIndicatorScreen.addInfoToTextArea("Validating input..");
+                ProgressIndicatorScreen.getInstance().addInfoToTextArea("Validating input..");
 
                 if (!Validate.validateStartscreen()){
-                    progressIndicatorScreen.addInfoToTextArea("input valid");
+                    ProgressIndicatorScreen.getInstance().addInfoToTextArea("input valid");
                     reportType = ReportTypes.getTypeFromDescription((reportTypeCombo.getSelectedItem().toString()));
                     reportLevel = ReportLevels.getLevelFromDescription(levelCombo.getSelectedItem().toString());
-                    new Controller(StartScreen.this);
+                    new Controller().setStartScreenDataToController();
                 } else {
-                    ProgressIndicatorScreen.addInfoToTextArea("input error..");
+                    ProgressIndicatorScreen.getInstance().addInfoToTextArea("input error..");
                 }
             }
         };
@@ -381,7 +385,7 @@ public class StartScreen implements ActionListener {
 
         String java = System.getProperty("java.specification.version");
         double version = Double.valueOf(java);
-        double reqVer = 1.6;
+        double reqVer = 1.7;
         if (version < reqVer) {
             //Show errorScreen with Wrong version msg
         }
@@ -393,7 +397,7 @@ public class StartScreen implements ActionListener {
 
     }
 
-    public static String getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -414,4 +418,189 @@ public class StartScreen implements ActionListener {
             }
         }
     };
+
+
+    public JTextField getReportUserName() {
+        return reportUserName;
+    }
+
+    public void setReportUserName(JTextField reportUserName) {
+        this.reportUserName = reportUserName;
+    }
+
+    public JPasswordField getPasswordField() {
+        return passwordField;
+    }
+
+    public void setPasswordField(JPasswordField passwordField) {
+        this.passwordField = passwordField;
+    }
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public void setFrame(JFrame frame) {
+        this.frame = frame;
+    }
+
+    public JComboBox getLevelCombo() {
+        return levelCombo;
+    }
+
+    public void setLevelCombo(JComboBox levelCombo) {
+        this.levelCombo = levelCombo;
+    }
+
+    public JComboBox getReportTypeCombo() {
+        return reportTypeCombo;
+    }
+
+    public void setReportTypeCombo(JComboBox reportTypeCombo) {
+        this.reportTypeCombo = reportTypeCombo;
+    }
+
+    public JComboBox getMergeByCombo() {
+        return mergeByCombo;
+    }
+
+    public void setMergeByCombo(JComboBox mergeByCombo) {
+        this.mergeByCombo = mergeByCombo;
+    }
+
+    public JTextField getCompanyCode() {
+        return companyCode;
+    }
+
+    public void setCompanyCode(JTextField companyCode) {
+        this.companyCode = companyCode;
+    }
+
+    public JLabel getCompanyCodeError() {
+        return companyCodeError;
+    }
+
+    public void setCompanyCodeError(JLabel companyCodeError) {
+        this.companyCodeError = companyCodeError;
+    }
+
+    public JLabel getMerchantCodeLabel() {
+        return merchantCodeLabel;
+    }
+
+    public void setMerchantCodeLabel(JLabel merchantCodeLabel) {
+        this.merchantCodeLabel = merchantCodeLabel;
+    }
+
+    public JTextField getMerchantCode() {
+        return merchantCode;
+    }
+
+    public void setMerchantCode(JTextField merchantCode) {
+        this.merchantCode = merchantCode;
+    }
+
+    public JLabel getMerchantCodeError() {
+        return merchantCodeError;
+    }
+
+    public void setMerchantCodeError(JLabel merchantCodeError) {
+        this.merchantCodeError = merchantCodeError;
+    }
+
+    public JLabel getReportUserNameError() {
+        return reportUserNameError;
+    }
+
+    public void setReportUserNameError(JLabel reportUserNameError) {
+        this.reportUserNameError = reportUserNameError;
+    }
+
+    public JLabel getPasswordError() {
+        return passwordError;
+    }
+
+    public void setPasswordError(JLabel passwordError) {
+        this.passwordError = passwordError;
+    }
+
+    public JButton getPathButton() {
+        return pathButton;
+    }
+
+    public void setPathButton(JButton pathButton) {
+        this.pathButton = pathButton;
+    }
+
+    public JButton getContinueButton() {
+        return continueButton;
+    }
+
+    public void setContinueButton(JButton continueButton) {
+        this.continueButton = continueButton;
+    }
+
+    public JButton getExitButton() {
+        return exitButton;
+    }
+
+    public void setExitButton(JButton exitButton) {
+        this.exitButton = exitButton;
+    }
+
+    public JLabel getReportUserLabelEnd() {
+        return reportUserLabelEnd;
+    }
+
+    public void setReportUserLabelEnd(JLabel reportUserLabelEnd) {
+        this.reportUserLabelEnd = reportUserLabelEnd;
+    }
+
+    public JLabel getPathError() {
+        return pathError;
+    }
+
+    public void setPathError(JLabel pathError) {
+        this.pathError = pathError;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public JFileChooser getChooser() {
+        return chooser;
+    }
+
+    public void setChooser(JFileChooser chooser) {
+        this.chooser = chooser;
+    }
+
+    public ReportTypes getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(ReportTypes reportType) {
+        this.reportType = reportType;
+    }
+
+    public ReportLevels getReportLevel() {
+        return reportLevel;
+    }
+
+    public void setReportLevel(ReportLevels reportLevel) {
+        this.reportLevel = reportLevel;
+    }
+
+    public static void setInstance(StartScreen instance) {
+        StartScreen.instance = instance;
+    }
+
+    public WindowListener getExitListener() {
+        return exitListener;
+    }
+
+    public void setExitListener(WindowListener exitListener) {
+        this.exitListener = exitListener;
+    }
 }

@@ -1,7 +1,5 @@
 package com.adyen.reportMerger.entities;
 
-import java.util.List;
-
 /**
  * Created by andrew on 9/21/16.
  */

@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 
 /**
  * Created by andrew on 9/27/16.
+ *
+ * not sure this is ever actually used
  */
 public class ErrorScreen {
 

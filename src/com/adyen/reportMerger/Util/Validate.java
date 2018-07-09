@@ -14,93 +14,93 @@ public final class Validate {
     }
 
     public static boolean validateStartscreen () {
+        StartScreen startScreen = StartScreen.getInstance();
 
         boolean errors = false;
 
-        // Check if the path is correct
-        if (StartScreen.path.equals(null)) {
+        // Check if the path is correct ///what is going on here?
+        if (startScreen.getPath() == null) {
 
-            StartScreen.pathError.setText("The selected path: " + StartScreen.getPath()
+            startScreen.getPathError().setText("The selected path: " + startScreen.getPath()
                     + " is incorrect. Please, select a correct path.");
             errors = true;
         }
 
-        if ((new String(StartScreen.passwordField.getPassword())).length() < 20) {
-            StartScreen.passwordError
+        if ((new String(startScreen.getPasswordField().getPassword())).length() < 20) {
+            startScreen.getPasswordError()
                     .setText("A password has to have 20 or more chars.");
-            StartScreen.passwordField.moveCaretPosition(0);
+            startScreen.getPasswordField().moveCaretPosition(0);
             errors = true;
         }
 
-        if (StartScreen.merchantCode.getText().isEmpty()
-                || StartScreen.merchantCode.getText().length() < 4) {
-            StartScreen.merchantCodeError
+        if (startScreen.getMerchantCode().getText().isEmpty()
+                || startScreen.getMerchantCode().getText().length() < 4) {
+            startScreen.getMerchantCodeError()
                     .setText("A merchant code has to have 4 or more chars.");
-            StartScreen.merchantCode.moveCaretPosition(0);
+            startScreen.getMerchantCode().moveCaretPosition(0);
             errors = true;
         }
 
-        if (StartScreen.companyCode.getText().isEmpty()
-                || StartScreen.companyCode.getText().length() < 4) {
-            StartScreen.companyCodeError
+        if (startScreen.getCompanyCode().getText().isEmpty()
+                || startScreen.getCompanyCode().getText().length() < 4) {
+            startScreen.getCompanyCodeError()
                     .setText("A company code has to have 4 or more chars.");
-            StartScreen.companyCode.moveCaretPosition(0);
+            startScreen.getCompanyCode().moveCaretPosition(0);
             errors = true;
         }
 
-        if (StartScreen.reportUserName.getText().isEmpty()
-                || StartScreen.reportUserName.getText().length() < 4) {
-            StartScreen.reportUserNameError
+        if (startScreen.getReportUserName().getText().isEmpty()
+                || startScreen.getReportUserName().getText().length() < 4) {
+            startScreen.getReportUserNameError()
                     .setText("A report user has to have 4 or more chars.");
-            StartScreen.reportUserName.moveCaretPosition(0);
+            startScreen.getReportUserName().moveCaretPosition(0);
             errors = true;
         }
 
 //         Controlling blank spaces
-        String passS = new String(StartScreen.passwordField.getPassword());
+        String passS = new String(startScreen.getPasswordField().getPassword());
         if (passS.contains("\t")
                 || passS.contains("\n")
                 || passS.contains("\r")
                 || passS.contains("\f")
                 || passS.contains(" ")) {
-//					System.out.println(passS);
-            StartScreen.passwordError
+            startScreen.getPasswordError()
                     .setText("A password can not content blank spaces");
-            StartScreen.passwordField.moveCaretPosition(0);
+            startScreen.getPasswordField().moveCaretPosition(0);
             errors = true;
         }
 
-        if (ReportLevels.getLevelFromDescription(StartScreen.levelCombo.getSelectedItem().toString() ) != ReportLevels.MULTIMERCHANT && (StartScreen.merchantCode.getText().contains("\t")
-                || StartScreen.merchantCode.getText().contains("\n")
-                || StartScreen.merchantCode.getText().contains("\r")
-                || StartScreen.merchantCode.getText().contains("\f")
-                || StartScreen.merchantCode.getText().contains(" "))) {
-            StartScreen.merchantCodeError
+        if (ReportLevels.getLevelFromDescription(startScreen.getLevelCombo().getSelectedItem().toString() ) != ReportLevels.MULTIMERCHANT && (startScreen.getMerchantCode().getText().contains("\t")
+                || startScreen.getMerchantCode().getText().contains("\n")
+                || startScreen.getMerchantCode().getText().contains("\r")
+                || startScreen.getMerchantCode().getText().contains("\f")
+                || startScreen.getMerchantCode().getText().contains(" "))) {
+            startScreen.getMerchantCodeError()
                     .setText("A merchant code can have blank spaces on "
-                            + StartScreen.levelCombo.getSelectedItem().toString() + ".");
-            StartScreen.merchantCode.moveCaretPosition(0);
+                            + startScreen.getLevelCombo().getSelectedItem().toString() + ".");
+            startScreen.getMerchantCode().moveCaretPosition(0);
             errors = true;
         }
 
-        if (StartScreen.companyCode.getText().contains(" ")
-                || StartScreen.companyCode.getText().contains("\n")
-                || StartScreen.companyCode.getText().contains("\r")
-                || StartScreen.companyCode.getText().contains("\f")
-                || StartScreen.companyCode.getText().contains(" ")) {
-            StartScreen.companyCodeError
+        if (startScreen.getCompanyCode().getText().contains(" ")
+                || startScreen.getCompanyCode().getText().contains("\n")
+                || startScreen.getCompanyCode().getText().contains("\r")
+                || startScreen.getCompanyCode().getText().contains("\f")
+                || startScreen.getCompanyCode().getText().contains(" ")) {
+            startScreen.getCompanyCodeError()
                     .setText("A company code can not have blank spaces.");
-            StartScreen.companyCode.moveCaretPosition(0);
+            startScreen.getCompanyCode().moveCaretPosition(0);
             errors = true;
         }
 
-        if (StartScreen.reportUserName.getText().contains(" ")
-                || StartScreen.reportUserName.getText().contains("\n")
-                || StartScreen.reportUserName.getText().contains("\r")
-                || StartScreen.reportUserName.getText().contains("\f")) {
-            System.out.println(StartScreen.reportUserName.getText());
-            StartScreen.reportUserNameError
+        if (startScreen.getReportUserName().getText().contains(" ")
+                || startScreen.getReportUserName().getText().contains("\n")
+                || startScreen.getReportUserName().getText().contains("\r")
+                || startScreen.getReportUserName().getText().contains("\f")) {
+
+            startScreen.getReportUserNameError()
                     .setText("A report user can not have blank spaces.");
-            StartScreen.reportUserName.moveCaretPosition(0);
+            startScreen.getReportUserName().moveCaretPosition(0);
             errors = true;
         }
 

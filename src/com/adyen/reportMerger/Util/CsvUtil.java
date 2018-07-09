@@ -1,18 +1,10 @@
 package com.adyen.reportMerger.Util;
 
-import com.adyen.reportMerger.entities.LogFileHandler;
-import com.adyen.reportMerger.entities.ReportLocation;
+import com.adyen.reportMerger.entities.HeaderCollection;
 import com.adyen.reportMerger.gui.ProgressIndicatorScreen;
-import com.adyen.reportMerger.gui.StartScreen;
-import com.adyen.reportMerger.runners.Controller;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
+import java.util.*;
 
 /**
  * Created by andrew on 9/21/16.
@@ -20,9 +12,10 @@ import java.util.logging.Logger;
 public final class CsvUtil {
 
 
-    public static boolean validateCSV (String fileLocation) {
+    public static boolean validateCSV (File file) {
 
-        return false;
+        //todo   actual validation
+        return true;
     }
 
     public static File csvToJavaFile (String fileLocation) {
@@ -47,16 +40,16 @@ public final class CsvUtil {
 
             }
         } catch (FileNotFoundException e1) {
-            ProgressIndicatorScreen.addInfoToTextArea(file.getName() + "could not be found while parsing to StringList :" +e1.getMessage());
+            ProgressIndicatorScreen.getInstance().addInfoToTextArea(file.getName() + "could not be found while parsing to StringList :" +e1.getMessage());
 
         } catch (IOException e) {
-            ProgressIndicatorScreen.addInfoToTextArea(file.getName() + "caused an IOException while parsing to StringList :" + e.getMessage());
+            ProgressIndicatorScreen.getInstance().addInfoToTextArea(file.getName() + "caused an IOException while parsing to StringList :" + e.getMessage());
         } finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    ProgressIndicatorScreen.addInfoToTextArea("An error orcurred while closing BufferedReader" + e.getMessage());
+                    ProgressIndicatorScreen.getInstance().addInfoToTextArea("An error orcurred while closing BufferedReader" + e.getMessage());
                 }
             }
         }
@@ -81,13 +74,13 @@ public final class CsvUtil {
             return 	headers;
 
         } catch (IOException e1) {
-            ProgressIndicatorScreen.addInfoToTextArea(file.getName() + "could not be found while parsing to StringList :" +e1.getMessage());
+            ProgressIndicatorScreen.getInstance().addInfoToTextArea(file.getName() + "could not be found while parsing to StringList :" +e1.getMessage());
         } finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    ProgressIndicatorScreen.addInfoToTextArea("An error orcurred while closing BufferedReader" + e.getMessage());
+                    ProgressIndicatorScreen.getInstance().addInfoToTextArea("An error orcurred while closing BufferedReader" + e.getMessage());
                 }
             }
         }
@@ -163,7 +156,7 @@ public final class CsvUtil {
 //        at com.adyen.reportMerger.Util.CsvUtil.fillCsvFileMerge(CsvUtil.java:180
         //report 11 changed the structure of the report  (the key is still there though..
 
-        int nrOfRows =0;
+        int nrOfRows = 0;
         if (mergeMap == null) {
             return null;
         }
@@ -225,5 +218,97 @@ public final class CsvUtil {
         }
 
         return sb;
+    }
+
+    //This only works if headers is passed and the bufferedReader already had the first line read (so no headers included)
+    private static Map<String, List<String>> bufferedReaderCsvToHashMap(List<String> headers, BufferedReader bufferedReader) throws IOException {
+
+        //initiate a map put the headers as key values
+        Map<String, List<String>> map = new LinkedHashMap<>();
+        for (String s : headers) {
+            map.put(s, new ArrayList<>());
+        }
+
+
+        String line;
+        while((line = bufferedReader.readLine()) != null){
+//            List<String> list = Arrays.asList(line.split("\\s*,\\s*"));
+//            List<String> list = Lists.newArrayList(Splitter.on(",").split(line));
+            List<String> list = CsvUtil.csvLineToList(line);
+
+            //why!?  out of bounds
+            int x = 0;
+            for (String s : list) {
+                String mapKey = headers.get(x);
+                map.get(mapKey).add(s);
+                x++;
+            }
+        }
+
+        return map;
+    }
+
+
+    public static String fixCsvWithWrongColumns(List<String> headers, BufferedReader bufferedReader) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            Map<String , List<String>> map = bufferedReaderCsvToHashMap(headers, bufferedReader);
+
+            String key =  (String)map.keySet().toArray()[0];
+            int nrOfRows = map.get(key).size();
+
+            for (int x = 0; x < nrOfRows ; x++) {
+                for (String header : HeaderCollection.getInstance().getHeaders()) {
+
+                    if (null == map.get(header) || map.get(header).size() == 0 ) {
+                        sb.append("");
+                    } else{
+                        sb.append(map.get(header).get(x));
+                    }
+                    if (! HeaderCollection.getInstance().isLastHeader(header)) {
+                        sb.append(",");
+                    }else {
+                        sb.append("\n");
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
+    }
+
+    public static List<String> csvLineToList(String csvLine) {
+
+        List<String> list = new ArrayList<>();
+        if (csvLine == null) {
+            return list;
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        int n = 0;
+        for (int i = 0; i < csvLine.length(); i++) {
+            char c = csvLine.charAt(i);
+
+            sb.append(c);
+
+            if (n % 2 == 0) {
+                if (c == ',') {
+                    sb.deleteCharAt(sb.length() - 1);
+                    list.add(sb.toString());
+                    sb = new StringBuilder();
+                }
+            }
+
+            if (c == '"') {
+                n++;
+            }
+        }
+
+        list.add(sb.toString());
+        return list;
     }
 }

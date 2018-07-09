@@ -1,48 +1,51 @@
 package com.adyen.reportMerger.gui;
 
 import javax.swing.*;
-import javax.swing.text.DefaultCaret;
 import java.awt.*;
 
 /**
  * Created by andrew on 10/27/16.
- * this class is only to create a screen to indicate to the user something is happening in the background
+ * this class is here to create a screen to indicate to the user something is happening in the background
  * I might add some time indicators
  */
 public final class ProgressIndicatorScreen {
 
-    public static JFrame progressIndicatorFrame = new JFrame("Adyen Report Merger Log Frame");
-    public static JPanel whatHappensPanel = new JPanel();
-    public static JLabel whatHappensLabel = new JLabel();
-    public static JTextArea whatHappensTextArea = new JTextArea(18,24);
+    private JFrame progressIndicatorFrame = new JFrame("Adyen Report Merger Log Frame");
+    private JScrollPane scrollPane ;
+    private JTextArea whatHappensTextArea = new JTextArea(18,38);
 
-    public ProgressIndicatorScreen(){
-        progressIndicatorFrame.setSize(new Dimension(600, 400));
-        whatHappensPanel = new JPanel();
-        whatHappensPanel.add(new JScrollPane(whatHappensTextArea), BorderLayout.CENTER);
-        progressIndicatorFrame.add(whatHappensPanel);
+    private static ProgressIndicatorScreen instance;
 
-        whatHappensTextArea.append("Starting Log Frame");
-        DefaultCaret caret = (DefaultCaret) whatHappensTextArea.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+    public static ProgressIndicatorScreen getInstance() {
 
-        progressIndicatorFrame.validate();
-        progressIndicatorFrame.setVisible(true);
-
+        if (instance == null) {
+            instance = new ProgressIndicatorScreen();
+        }
+        return instance;
     }
 
-    public static void addInfoToTextArea(String data){
+    private ProgressIndicatorScreen(){
+
+        progressIndicatorFrame.setSize(new Dimension(600, 400));
+        whatHappensTextArea.append("Starting Log Frame");
+        scrollPane = new JScrollPane(whatHappensTextArea);
+        progressIndicatorFrame.add(scrollPane, BorderLayout.CENTER);
+        progressIndicatorFrame.validate();
+        progressIndicatorFrame.setVisible(true);
+    }
+
+
+    public void addInfoToTextArea(String data){
+
+        progressIndicatorFrame.toFront();
 
         whatHappensTextArea.append("\n");
         whatHappensTextArea.append(data);
-        progressIndicatorFrame.update(whatHappensTextArea.getGraphics());
+
+        whatHappensTextArea.setCaretPosition(whatHappensTextArea.getDocument().getLength() - data.length());
+        scrollPane.update(whatHappensTextArea.getGraphics());
 
     }
 
-    public void setWhatHappensLabel(String text) {
-        whatHappensLabel.setText(text);
-        progressIndicatorFrame.getContentPane().add(whatHappensLabel);
-        progressIndicatorFrame.setVisible(true);
-    }
 
 }

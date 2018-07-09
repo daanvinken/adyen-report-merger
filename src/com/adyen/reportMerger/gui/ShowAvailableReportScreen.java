@@ -2,11 +2,10 @@ package com.adyen.reportMerger.gui;
 
 
 import com.adyen.reportMerger.Util.ConnectionUtil;
+import com.adyen.reportMerger.builder.CsvMerger;
 import com.adyen.reportMerger.entities.CsvClass;
-import com.adyen.reportMerger.entities.LogFileHandler;
 import com.adyen.reportMerger.entities.MergeTypes;
 import com.adyen.reportMerger.entities.ReportLocation;
-
 import com.adyen.reportMerger.runners.Controller;
 import com.toedter.calendar.JDateChooser;
 
@@ -15,7 +14,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.*;
 import java.util.List;
 
@@ -27,7 +25,7 @@ import java.util.List;
 public class ShowAvailableReportScreen {
 
     //used to go back to startscreen with same values
-    public static StartScreen startScreen;
+//    public static StartScreen startScreen;
     //Take startScreen frame to copy properties from
     public static JFrame startScreenFrame;
 
@@ -39,7 +37,6 @@ public class ShowAvailableReportScreen {
     public JPanel buttonPanel;
     private JButton mergeButton;
     private JButton backButton;
-
 
 
     //ShowAvailableReport batchSearch Elements
@@ -68,14 +65,14 @@ public class ShowAvailableReportScreen {
     //TODO make sure users can either Merge all visible Reports or specific selection
     //TODO add validation to ensure startBatch < endBatch and startDate < endDate
 
-    public ShowAvailableReportScreen( JFrame frame, List<ReportLocation> reportLocationList, StartScreen startScreen ) {
+    public ShowAvailableReportScreen( JFrame frame, List<ReportLocation> reportLocationList ) {
 
-        this.startScreen = startScreen;
+//        this.startScreen = startScreen;
         this.startScreenFrame = frame;
         this.reportLocationList = reportLocationList;
 
 
-        MergeTypes mergeType = MergeTypes.getMergeTypeFromDescription(startScreen.mergeByCombo.getSelectedItem().toString());
+        MergeTypes mergeType = MergeTypes.getMergeTypeFromDescription(StartScreen.getInstance().getMergeByCombo().getSelectedItem().toString());
 
         //Initialize new JFrame
         showAvailableReportFrame = new JFrame();
@@ -333,8 +330,8 @@ public class ShowAvailableReportScreen {
             public void actionPerformed(ActionEvent e) {
                 showAvailableReportFrame.setVisible(false);
                 Rectangle currentPosition = showAvailableReportFrame.getBounds();
-                startScreen.frame.setVisible(true);
-                startScreen.frame.setBounds(currentPosition);
+                StartScreen.getInstance().getFrame().setVisible(true);
+                StartScreen.getInstance().getFrame().setBounds(currentPosition);
             }
         });
 
@@ -345,12 +342,7 @@ public class ShowAvailableReportScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                ProgressIndicatorScreen.progressIndicatorFrame.toFront();
-
-
-                String userName = startScreen.reportUserName.getText() + "@Company."+startScreen.companyCode.getText();
-                char [] passWord = startScreen.passwordField.getPassword();
-                String credentialString = ConnectionUtil.getCredentialString(userName, passWord);
+                String credentialString = ConnectionUtil.getCredentialString();
 
 
                 //Order by BatchNumber
@@ -367,10 +359,13 @@ public class ShowAvailableReportScreen {
                     return o1.getAccountCode().compareTo(o2.getAccountCode());
                 });
 
+                if (Controller.newStyleMerge) {
+                    //this style uses separate thread for merging logic to make sure the GUI skeeps updating
+                    new CsvMerger(selectReportLocationList, mergeType).execute();
 
-
-                new CsvClass( selectReportLocationList, startScreen.path, credentialString, true, mergeType);
-
+                } else {
+                    new CsvClass( selectReportLocationList, StartScreen.getInstance().getPath(), credentialString, true, mergeType);
+                }
 
             }
         });
@@ -386,7 +381,7 @@ public class ShowAvailableReportScreen {
 
 
     //remove the searchlist panel and content and readd
-    public void setSearchResultJList () {
+    private void setSearchResultJList () {
 
         showAvailableReportFrame.getContentPane().remove(searchResultPanel);
         searchResultPanel.remove(selectReportLocationJList);
@@ -418,8 +413,6 @@ public class ShowAvailableReportScreen {
                     "Exit Confirmation", JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, null, null);
             if (confirm == 0) {
-//                Controller.fileHandler.close();
-//                LogFileHandler.deleteEmptyLogFile(Controller.getPath());
                 System.exit(0);
             }
         }
