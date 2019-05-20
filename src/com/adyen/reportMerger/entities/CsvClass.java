@@ -5,11 +5,6 @@ import com.adyen.reportMerger.Util.CsvUtil;
 import com.adyen.reportMerger.gui.DownloadResultScreen;
 import com.adyen.reportMerger.gui.ProgressIndicatorScreen;
 import com.adyen.reportMerger.gui.ShowAvailableReportScreen;
-import com.adyen.reportMerger.gui.StartScreen;
-import com.adyen.reportMerger.runners.Controller;
-
-import javax.swing.*;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,23 +12,27 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
+import java.util.Scanner;
 
 /**
  * Created by andrew on 9/27/16.
+ *
  */
+
+//TODO  * This class does to many things:
+// It should be refactored to smaller, single responsible classes *
+
 public class CsvClass {
 
-    public File tmpCsv;
-    public List<File> tmpFileList;
-    public List<String> tmpHeaderList;
-    public File mergedCsv;
-    public List<ReportLocation> filesNotDownloaded ;
-    public String tmpFilePath;
-    public List<LinkedHashMap<String, List<String>>> tmpMapList;
-    public LinkedHashMap<String, List<String>> mergedCsvMap;
-    public StringBuilder mergedCsvToString;
+    private File tmpCsv;
+    private List<File> tmpFileList;
+    private List<String> tmpHeaderList;
+    private File mergedCsv;
+    private List<ReportLocation> filesNotDownloaded ;
+    private String tmpFilePath;
+    private List<LinkedHashMap<String, List<String>>> tmpMapList;
+    private LinkedHashMap<String, List<String>> mergedCsvMap;
+    private StringBuilder mergedCsvToString;
 
 
     public CsvClass ( List<ReportLocation> rl, String path, String credentialString, boolean deleteLocalFiles , MergeTypes mt) {
@@ -42,22 +41,22 @@ public class CsvClass {
         tmpFileList = new ArrayList<>();
         tmpMapList = new ArrayList<>();
 
-        ProgressIndicatorScreen.addInfoToTextArea("Start Download for the chosen reports..");
+        ProgressIndicatorScreen.getInstance().addInfoToTextArea("Start Download for the chosen reports..");
 
         for (ReportLocation r : rl) {
 
-            ProgressIndicatorScreen.addInfoToTextArea("Set tmp File Path..");
+            ProgressIndicatorScreen.getInstance().addInfoToTextArea("Set tmp File Path..");
 
             tmpFilePath = path + File.separator + r.getNewReportName();
-            ProgressIndicatorScreen.addInfoToTextArea(tmpFilePath);
+            ProgressIndicatorScreen.getInstance().addInfoToTextArea(tmpFilePath);
 
 
             //downloadCsv();
-            ProgressIndicatorScreen.addInfoToTextArea("DownLoad : " + r.getNewReportName());
+            ProgressIndicatorScreen.getInstance().addInfoToTextArea("DownLoad : " + r.getNewReportName());
 
             if (ConnectionUtil.downloadFile(r.getReportDownloadURL(), credentialString ,r.getNewReportName() , path) ) {
                 r.setDownloadSucceeded(true);
-                ProgressIndicatorScreen.addInfoToTextArea("Download successful");
+                ProgressIndicatorScreen.getInstance().addInfoToTextArea("Download successful");
 
                 //ReadCsv from Machine
                 tmpCsv = CsvUtil.csvToJavaFile(tmpFilePath);
@@ -71,13 +70,13 @@ public class CsvClass {
 
             }else {
                 filesNotDownloaded.add(r);
-                continue;
             }
         }
+
         LinkedHashMap<String, List<String>> mergeList = CsvUtil.startCsvFileMerge(tmpHeaderList);
 
         for (File file : tmpFileList){
-            ProgressIndicatorScreen.addInfoToTextArea("Merge file: "+ file.getName());
+            ProgressIndicatorScreen.getInstance().addInfoToTextArea("Merge file: "+ file.getName());
 
             List<List<String>> valList = CsvUtil.csvValuesToListStringList(file);
             List<List<String>> valListEven = CsvUtil.csvEvenColumns(valList);
@@ -119,18 +118,21 @@ public class CsvClass {
             mergedCsv.delete();
         }
 
+        Scanner scan = new Scanner(mergedCsvToString.toString());
         try {
             mergedCsv.createNewFile();
             FileWriter writer = new FileWriter(mergedCsv);
-            writer.write(mergedCsvToString.toString());
-            writer.flush();
+            while (scan.hasNextLine() ){
+                String oneLine = scan.nextLine();
+                writer.write(oneLine);
+                writer.flush();
+            }
             writer.close();
-
             new DownloadResultScreen(ShowAvailableReportScreen.showAvailableReportFrame,  true, mergedCsv.getAbsolutePath());
         } catch (IOException e) {
+            e.printStackTrace();
             new DownloadResultScreen(ShowAvailableReportScreen.showAvailableReportFrame, false, mergedCsv.getAbsolutePath());
-            ProgressIndicatorScreen.addInfoToTextArea("an exeption was thrown while creating the Merged CSV File :" + e.getMessage());
+            ProgressIndicatorScreen.getInstance().addInfoToTextArea("an exeption was thrown while creating the Merged CSV File :" + e.getMessage());
         }
     }
-
 }

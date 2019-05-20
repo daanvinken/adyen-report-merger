@@ -8,6 +8,7 @@ import java.util.logging.SimpleFormatter;
 
 /**
  * Created by andrew on 9/27/16.
+ * Class not used, maybe later
  */
 public final class LogFileHandler {
 

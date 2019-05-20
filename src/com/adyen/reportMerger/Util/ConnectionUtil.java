@@ -1,6 +1,11 @@
 package com.adyen.reportMerger.Util;
 
 import com.adyen.reportMerger.entities.*;
+import com.adyen.reportMerger.gui.ProgressIndicatorScreen;
+import com.adyen.reportMerger.gui.StartScreen;
+import com.adyen.reportMerger.runners.Controller;
+import com.google.common.base.Objects;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -10,10 +15,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import com.adyen.reportMerger.runners.Controller;
-import org.apache.commons.codec.binary.Base64;
 
 
 /**
@@ -23,7 +24,9 @@ public final class ConnectionUtil {
 
 
     private static final int BUFFER_SIZE = 4096;
-
+    private static String userName = StartScreen.getInstance().getReportUserName().getText() + "@Company."+StartScreen.getInstance().getCompanyCode().getText();
+    private static char [] passWord = StartScreen.getInstance().getPasswordField().getPassword();
+    private static String savePath = StartScreen.getInstance().getPath();
 
 
     public static List<URL> getUrlListBasedOnReportLevel (ReportLevels rl, String accountCode) {
@@ -73,8 +76,10 @@ public final class ConnectionUtil {
             case MULTIMERCHANT: {
                 urlList = new ArrayList<>();
 
-                List<String>multipleAccountCodes = Arrays.asList(accountCode.toString().trim().split(","));
+//                List<String>multipleAccountCodes = Arrays.asList(accountCode.toString().trim().split(","));
+//                List<String> multipleAccountCodes = Lists.newArrayList(Splitter.on(",").trimResults().split(accountCode));
 
+                List<String> multipleAccountCodes = CsvUtil.csvLineToList(accountCode);
                 for (String account : multipleAccountCodes) {
                     try {
 
@@ -96,8 +101,8 @@ public final class ConnectionUtil {
     }
 
     //base64 Encoded credentialString
-    public static String getCredentialString (String userName, char[] password) {
-        String pass = new String (password);
+    public static String getCredentialString () {
+        String pass = new String (passWord);
         String credentialString = userName + ":" + pass;
 
         // Encoding
@@ -215,5 +220,145 @@ public final class ConnectionUtil {
 
         return success;
     }
+
+    public static ReportLocation downloadFile(ReportLocation reportLocation) {
+        HttpURLConnection http;
+        try {
+            http = (HttpURLConnection) reportLocation.reportDownloadURL.openConnection();
+            http.setRequestProperty("Authorization", "Basic "
+                    + getCredentialString());
+            int responseCode = http.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream inputStream = http.getInputStream();
+                String saveFilePath = savePath + File.separator + reportLocation.newReportName;
+                FileOutputStream outputStream = new FileOutputStream(saveFilePath);
+
+                int bytesRead;
+                byte[] buffer = new byte[BUFFER_SIZE];
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+
+                outputStream.close();
+                inputStream.close();
+
+                reportLocation.setDownloadSucceeded(true);
+                reportLocation.setReport(new File(saveFilePath));
+                reportLocation.setReportHeaders(CsvUtil.csvHeaderToStringList(reportLocation.getReport()));
+                return reportLocation;
+
+            } else {
+                Controller.errorType = ErrorTypes.ERROR_DOWNLOAD_FILE;
+            }
+            http.disconnect();
+
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+        reportLocation.setDownloadSucceeded(false);
+
+
+        return reportLocation;
+    }
+
+
+    public static List<String> downloadHeader(ReportLocation reportLocation) {
+        HttpURLConnection http;
+        try {
+            http = (HttpURLConnection) reportLocation.reportDownloadURL.openConnection();
+            http.setRequestProperty("Authorization", "Basic "
+                    + getCredentialString());
+            int responseCode = http.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream inputStream = http.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line = reader.readLine();
+                http.disconnect();
+
+//                return Lists.newArrayList(Splitter.on(",").split(line));
+                return CsvUtil.csvLineToList(line);
+
+            } else {
+                Controller.errorType = ErrorTypes.ERROR_DOWNLOAD_FILE;
+                return null;
+            }
+
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+    public static String dynamicDownloadFileAsString(ReportLocation reportLocation, boolean includeHeader) {
+
+        HttpURLConnection http;
+        try {
+            http = (HttpURLConnection) reportLocation.reportDownloadURL.openConnection();
+            http.setRequestProperty("Authorization", "Basic "
+                    + getCredentialString());
+            int responseCode = http.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream inputStream = http.getInputStream();
+                ProgressIndicatorScreen.getInstance().addInfoToTextArea("Downloading report: " + reportLocation.reportName);
+
+                // create files if deleteFiles is switched off
+                if (! Controller.deleteFiles) {
+                    String saveFilePath = savePath + File.separator + reportLocation.newReportName;
+                    FileOutputStream outputStream = new FileOutputStream(saveFilePath);
+
+                    int bytesRead;
+                    byte[] buffer = new byte[BUFFER_SIZE];
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+
+                    outputStream.close();
+                }
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                //check if headers match
+                StringBuilder sb = new StringBuilder();
+                String header = reader.readLine();
+
+//                if (Objects.equal(Lists.newArrayList(Splitter.on(",").trimResults().split(header)), HeaderCollection.getInstance().getHeaders())) {
+                if (Objects.equal(CsvUtil.csvLineToList(header), HeaderCollection.getInstance().getHeaders())) {
+
+                    if (includeHeader) {
+                        sb.append(header);
+                        sb.append("\n");
+                    }
+                    String line;
+
+                    while((line = reader.readLine()) != null){
+                        sb.append(line);
+                        sb.append("\n");
+                    }
+
+                } else {
+                    List<String> headerListCurrentReport = CsvUtil.csvLineToList(header);
+                    sb.append(CsvUtil.fixCsvWithWrongColumns(headerListCurrentReport , reader));
+                    sb.append("\n");
+                }
+
+                http.disconnect();
+
+                return sb.toString();
+
+            } else {
+                Controller.errorType = ErrorTypes.ERROR_DOWNLOAD_FILE;
+                return null;
+            }
+
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+        return "";
+    }
+
 
 }

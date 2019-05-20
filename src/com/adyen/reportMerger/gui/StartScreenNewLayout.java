@@ -229,7 +229,6 @@ public class StartScreenNewLayout implements ActionListener {
             @Override
             public void focusLost(FocusEvent e) {
 
-//				System.out.println("in companyCodeListener");
                 reportUserLabelEnd.setText("@Company." + companyCode.getText());
             }
 
@@ -298,17 +297,16 @@ public class StartScreenNewLayout implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                ProgressIndicatorScreen progressIndicatorScreen = new ProgressIndicatorScreen();
 
-                progressIndicatorScreen.addInfoToTextArea("Validating input..");
+                ProgressIndicatorScreen.getInstance().addInfoToTextArea("Validating input..");
 
                 if (!Validate.validateStartscreen()){
-                    progressIndicatorScreen.addInfoToTextArea("input valid");
+                    ProgressIndicatorScreen.getInstance().addInfoToTextArea("input valid");
                     reportType = ReportTypes.getTypeFromDescription((reportTypeCombo.getSelectedItem().toString()));
                     reportLevel = ReportLevels.getLevelFromDescription(levelCombo.getSelectedItem().toString());
 //                    new Controller(StartScreen.this);
                 } else {
-                    ProgressIndicatorScreen.addInfoToTextArea("input error..");
+                    ProgressIndicatorScreen.getInstance().addInfoToTextArea("input error..");
                 }
             }
         };

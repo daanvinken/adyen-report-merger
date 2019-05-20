@@ -1,14 +1,12 @@
 package com.adyen.reportMerger.entities;
 
-import com.adyen.reportMerger.runners.Controller;
-
+import java.io.File;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
+import java.util.List;
 
 /**
  * Created by andrew on 9/21/16.
@@ -24,6 +22,8 @@ public class ReportLocation {
     public String accountCode;
     public String newReportName;
     public boolean downloadSucceeded;
+    private File report;
+    private List<String> reportHeaders;
 
 
     public ReportLocation() {
@@ -116,5 +116,21 @@ public class ReportLocation {
 
     public void setDownloadSucceeded(boolean downloadSucceeded) {
         this.downloadSucceeded = downloadSucceeded;
+    }
+
+    public File getReport() {
+        return report;
+    }
+
+    public void setReport(File report) {
+        this.report = report;
+    }
+
+    public List<String> getReportHeaders() {
+        return reportHeaders;
+    }
+
+    public void setReportHeaders(List<String> reportHeaders) {
+        this.reportHeaders = reportHeaders;
     }
 }
