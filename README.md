@@ -1,4 +1,12 @@
-# adyen-report-merger
+>:warning: Adyen Report Merger is deprecated :warning:
+>
+>We are no longer providing support for the Adyen Report Merger.
+>
+>Instead, you can generate a report for a particular date range in your Customer Area. In the next months, you will be able to do this across several merchant accounts.
+>
+>This repository will be deleted on September 1st 2022.
+> 
+# Adyen Report Merger
 The Adyen Report Merger Tool download a range of reports from the Adyen Backoffice with option to merge into one file
 
 This tool allows you, through an user interface, to choose a sequence of already available reports on your Merchant Account and download and/or merge them in just one file.
@@ -11,24 +19,31 @@ This tool allows you, through an user interface, to choose a sequence of already
 
 ## Basic usage instructions:
 
-1. Run project
+1. Run project:
+   - Apply the following steps in order to get started:
+      * Download the latest .jar file [here](https://github.com/Adyen/adyen-report-merger/releases).
+      * Make sure to have Java 8 or higher installed.
+      * Open up your terminal / command prompt and go to the directory of the downloaded JAR-file (e.g. `cd ~/Downloads`)
+      * Run the Java application by running `java -jar adyen-report-merger.jar` in your terminal
+   
+If you need any help, please contact your IT department.
 	
 2. Select the report you would like to get/merge in the combo box 'Report type'. This tool for now is just available for these reports: 
 	
-	- Settlement detail report
-	- Received payments report
-	- Payments accounting reports
+    - Settlement detail report
+    - Received payments report
+    - Payments accounting reports
 
 3. Select the way you would like to use to choose the reports range:
 	
-	- By batch: this option will show two combo boxes with every available reports, letting you choose a range.
-	- By date: this option will show two calendars you can choose the dates generation range from.
+    - By batch: this option will show two combo boxes with every available reports, letting you choose a range.
+    - By date: this option will show two calendars you can choose the dates generation range from.
 
 4. Introduce the credentials that are configured for your report user in the Adyen Customer Area. You can check it following these steps:
 	
-	Log in https://ca-live.adyen.com >> Settings >> Users >> report user
+    Log in https://ca-live.adyen.com >> Settings >> Users >> report user
 	
-	Note that you just have to insert the 'report user' till the '@' value, since the tool already detect the rest.
+    Note that you just have to insert the 'report user' till the '@' value, since the tool already detect the rest.
 	
 5. Choose the folder where you would like to place the generated reports clicking on the 'Choose path to save the reports' button.
 
@@ -38,9 +53,9 @@ This tool allows you, through an user interface, to choose a sequence of already
 
     - By batch: this option will show two combo boxes with every available reports, letting you choose a range. The 'Start batch' will be the first generated one, and the 'End batch' the last generated one. 
 	
-	- By date: this option will show two calendars. From these calendars you can choose the dates generation range you would like to get the reports. 
-	In the right list, you can see the reports are contained in the selected period.
-	Note you can also clear these dates to don't limit one or anyone of the date limits.
+    - By date: this option will show two calendars. From these calendars you can choose the dates generation range you would like to get the reports. 
+    In the right list, you can see the reports are contained in the selected period.
+    Note you can also clear these dates to don't limit one or anyone of the date limits.
 	
 8. You can choose in each one of these screens if you want to just download the reports or if you also want to merge them into one.
 
@@ -48,14 +63,14 @@ This tool allows you, through an user interface, to choose a sequence of already
 
 10. A successful screen should appear specifying the folder where the reports should be placed. 
 
-	Note in this screen you can go back to the initial screen clicking in 'Start again' button, being not needed to insert again the credentials.
+    Note in this screen you can go back to the initial screen clicking in 'Start again' button, being not needed to insert again the credentials.
 
 11. To open the file, if you choose Libre Office Calc or MS Excel, select just these options:
-	- Choose Character set: Western Europe (ISO-8859-15/EURO)
-	- Choose language: English
-	- Select as separator options just: Comma
-	- Other options:  Quoted special numbers
-	- Fields: Make pspreference, mercantreference and modificationreference columns type 'Text', since it is a number and the 'Standard' will round this big number.
+    - Choose Character set: Western Europe (ISO-8859-15/EURO)
+    - Choose language: English
+    - Select as separator options just: Comma
+    - Other options:  Quoted special numbers
+    - Fields: Make pspreference, mercantreference and modificationreference columns type 'Text', since it is a number and the 'Standard' will round this big number.
 
 Errors:
 - If you get an Error screen, it should shows the reason why the error has been generated and the solution to it. If it is not the case, please, contact support@adyen.com.
