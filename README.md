@@ -71,6 +71,3 @@ If you need any help, please contact your IT department.
     - Select as separator options just: Comma
     - Other options:  Quoted special numbers
     - Fields: Make pspreference, mercantreference and modificationreference columns type 'Text', since it is a number and the 'Standard' will round this big number.
-
-Errors:
-- If you get an Error screen, it should shows the reason why the error has been generated and the solution to it. If it is not the case, please, contact support@adyen.com.
